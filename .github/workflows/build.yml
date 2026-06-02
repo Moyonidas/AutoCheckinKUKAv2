@@ -28,19 +28,7 @@ jobs:
       - name: Install SDK
         run: sdkmanager "build-tools;34.0.0" "platforms;android-34"
 
-      - name: Generate keystore
-        run: |
-          keytool -genkeypair -v \
-            -keystore kuka.keystore \
-            -alias kukaalias \
-            -keyalg RSA \
-            -keysize 2048 \
-            -validity 10000 \
-            -storepass kukakuka \
-            -keypass kukakuka \
-            -dname "CN=KUKA Mexico, OU=IT, O=KUKA, L=SLP, S=SLP, C=MX"
-
-      - name: Find project root and build
+      - name: Find project and build
         run: |
           PROJECT_DIR=$(find . -name "settings.gradle" -not -path "/build/" | head -1 | xargs -I{} dirname {})
           echo "Proyecto en: $PROJECT_DIR"
@@ -49,22 +37,31 @@ jobs:
           curl -L "https://github.com/gradle/gradle/raw/v8.1.1/gradle/wrapper/gradle-wrapper.jar" \
             -o gradle/wrapper/gradle-wrapper.jar
           ./gradlew assembleRelease --no-daemon
+          echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
 
-      - name: Sign APK
+      - name: Generate keystore and sign APK
         run: |
-          PROJECT_DIR=$(find . -name "settings.gradle" -not -path "/build/" | head -1 | xargs -I{} dirname {})
-          APK_PATH="$PROJECT_DIR/app/build/outputs/apk/release/app-release-unsigned.apk"
+          keytool -genkeypair -v \
+            -keystore kuka.keystore \
+            -alias kukaalias \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass kukakuka -keypass kukakuka \
+            -dname "CN=KUKA Mexico, O=KUKA, C=MX"
+
+          APK=$(find $PROJECT_DIR -name "app-release-unsigned.apk" | head -1)
+          echo "APK encontrado: $APK"
+
           $ANDROID_SDK_ROOT/build-tools/34.0.0/apksigner sign \
             --ks kuka.keystore \
             --ks-key-alias kukaalias \
             --ks-pass pass:kukakuka \
             --key-pass pass:kukakuka \
-            --out app-release-signed.apk \
-            "$APK_PATH"
+            --out AutoCheckinKUKA.apk \
+            "$APK"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: AutoCheckinKUKA-release
-          path: app-release-signed.apk
+          path: AutoCheckinKUKA.apk
           retention-days: 30
