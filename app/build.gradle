@@ -15,24 +15,9 @@ android {
         versionName "1.0"
     }
 
-    buildTypes {
+buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
-    signingConfigs {
-        release {
-            storeFile file('../../../kuka.keystore')
-            storePassword 'kukakuka'
-            keyAlias 'kukaalias'
-            keyPassword 'kukakuka'
-        }
-    }
-    buildTypes {
-        release {
-            minifyEnabled false
-            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
