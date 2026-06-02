@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AutoCheckin KUKA</string>
+    <string name="accessibility_service_description">Automatiza el registro de entrada/salida en la app Runa al recibir un SMS con el código de empleado.</string>
+</resources>
